@@ -1,6 +1,14 @@
 {
-    "123": {
-        "password": "123",
+    "Staff": {
+        "password": "staff123",
+        "role": "Staff"
+    },
+    "admin": {
+        "password": "admin123",
+        "role": "Shop Owner"
+    },
+    "staff": {
+        "password": "staff123",
         "role": "Employee"
     }
 }
