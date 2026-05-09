@@ -5,7 +5,6 @@ import uuid
 
 st.set_page_config("Inventory Manager", layout="wide", initial_sidebar_state="expanded")
 
-# this was guided with gemini
 #checks if the file exists using the Path library.
 #If the file is found, it opens the file and loads the JSON data.
 #If the file is missing, it returns the provided default_data 
