@@ -5,6 +5,7 @@ import uuid
 
 st.set_page_config("Inventory Manager", layout="wide", initial_sidebar_state="expanded")
 
+
 #checks if the file exists using the Path library.
 #If the file is found, it opens the file and loads the JSON data.
 #If the file is missing, it returns the provided default_data 
@@ -188,7 +189,4 @@ elif st.session_state["role"] == "Employee":
                 else:
                     st.info("No items available to sell.")
 
-
-# Phase 2 (Real AI): You will connect an LLM to act as a "Business Analyst." 
-#The Shop Owner can ask the AI dynamic questions about their data, such as summarizing their most popular items or asking for recommendations on what products they should discount to clear out stagnant inventory.
-
+# this is a test to see if my git is working
