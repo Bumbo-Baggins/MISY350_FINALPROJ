@@ -3,6 +3,17 @@ import data_layer
 import service_layer
 import uuid
 
+# 1. Create the Data Manager object
+dm = data_layer.DataManager()
+
+# 2. Use the object's method to load your data
+users = dm.load_data(dm.users_file, {})
+inventory_raw = dm.load_data(dm.inventory_file, [])
+
+# 3. Initialize your service layer (which we will build next)
+# This will turn raw JSON dictionaries into Product objects
+inv_service = service_layer.InventoryService(dm)
+
 st.set_page_config("Inventory Manager", layout="wide", initial_sidebar_state="expanded")
 
 # File paths
@@ -53,15 +64,17 @@ if not st.session_state["logged_in"]:
         reg_user = st.text_input("New Username", key="reg_user")
         reg_pass = st.text_input("New Password", type="password", key="reg_pass")
         reg_role = st.selectbox("Role", ["Employee", "Shop Owner"])
+        # Inside your registration tab logic:
         if st.button("Register", type="primary"):
             if reg_user in users:
                 st.error("Username already exists.")
             elif reg_user and reg_pass:
                 users[reg_user] = {"password": reg_pass, "role": reg_role}
-                data_layer.save_json(users_file, users)
-                st.success("Account created. Please log in.")
-            else:
-                st.error("Please fill all fields.")
+                
+                # Use the class method 'save_data' instead of 'save_json'
+                dm.save_data(dm.users_file, users)
+                
+                st.success("Account created successfully. Please log in.")
 
 else:
     # Sidebar Navigation and Account Management [cite: 95, 206]
