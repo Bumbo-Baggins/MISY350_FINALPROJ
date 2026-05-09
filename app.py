@@ -1,17 +1,23 @@
 import streamlit as st
 import data_layer
 import service_layer
-import uuid
+import os
+from dotenv import load_dotenv
+
+# Load secrets from .env [cite: 40]
+load_dotenv()
+api_key = os.getenv("OPENAI_API_KEY")
+ai_assistant = service_layer.AIChatAssistant(api_key)
 
 # --- INITIALIZATION ---
-# Create the Data Manager and Service objects [cite: 112, 165]
+# Create the Data Manager and Service objects
 dm = data_layer.DataManager()
 inv_service = service_layer.InventoryService(dm)
 
-# Load users using the class method [cite: 171]
+# Load users using the class method 
 users = dm.load_data(dm.users_file, {})
 
-# Ensure test accounts exist [cite: 184, 190]
+# Ensure test accounts exist 
 if "admin" not in users:
     users["admin"] = {"password": "admin123", "role": "Shop Owner"}
     dm.save_data(dm.users_file, users)
@@ -27,7 +33,7 @@ if "logged_in" not in st.session_state:
 # --- UI LOGIC ---
 if not st.session_state["logged_in"]:
     st.title("Small Business Inventory Manager")
-    st.info("**Test Accounts:**\n* Owner: `admin` | Pass: `admin123`\n* Employee: `staff` | Pass: `staff123` [cite: 193]")
+    st.info("**Test Accounts:**\n* Owner: `admin` | Pass: `admin123`\n* Employee: `staff` | Pass: `staff123`")
     
     tab1, tab2 = st.tabs(["Login", "Register"])
     
@@ -56,7 +62,7 @@ if not st.session_state["logged_in"]:
                 st.success("Account created!")
 
 else:
-    # Sidebar [cite: 95, 206]
+    # --- SIDEBAR ---
     with st.sidebar:
         st.write(f"**User:** {st.session_state['username']}")
         if st.button("Logout"):
@@ -69,8 +75,57 @@ else:
                 st.session_state.clear()
                 st.rerun()
 
+    # --- ROLE-SPECIFIC DASHBOARDS ---
+    inventory_list = inv_service.get_all_inventory_dicts()
+
+    if st.session_state["role"] == "Shop Owner":
+        st.title("Owner Dashboard")
+        # Owner logic here...
+
+    elif st.session_state["role"] == "Employee":
+        st.title("Employee Dashboard")
+        # Employee logic here...
+
+# --- UNIVERSAL COMPONENTS ---
+    st.divider()
+    st.subheader("AI Business Assistant")
+    st.info("Ask the AI for advice on restocking or inventory trends.")
+    
+    # Initialize chat history
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+        st.session_state.messages.append({
+            "role": "assistant", 
+            "content": "Hi! Ask me a question about the inventory."
+        })
+
+    # Render visible chat history
+    chat_container = st.container()
+    with chat_container:
+        for msg in st.session_state.messages:
+            with st.chat_message(msg["role"]):
+                st.markdown(msg["content"])
+    
+    # Handle new chat input [cite: 164, 169]
+    user_input = st.chat_input("How can I help you?")
+    
+    if user_input:
+        st.session_state.messages.append({"role": "user", "content": user_input})
+        with chat_container.chat_message("user"):
+            st.markdown(user_input)
+            
+        with chat_container.chat_message("assistant"):
+            with st.spinner("Consulting the AI..."):
+                current_data = inv_service.get_all_inventory_dicts()
+                # Pass chat history to the service layer [cite: 214]
+                answer = ai_assistant.generate_response(current_data, st.session_state.messages)
+                st.markdown(answer)
+                
+        # Append AI response to state
+        st.session_state.messages.append({"role": "assistant", "content": answer})
+
     # --- DASHBOARDS ---
-    # Get current inventory data from the service layer [cite: 112]
+    # Get current inventory data from the service layer
     inventory_list = inv_service.get_all_inventory_dicts()
 
     if st.session_state["role"] == "Shop Owner":
