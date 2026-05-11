@@ -1,5 +1,3 @@
-## test
-
 import streamlit as st
 import data_layer
 import service_layer
@@ -88,12 +86,13 @@ else:
                     st.rerun()
 
     inventory_list = inv_service.get_all_inventory_dicts()
+    active_items = [i for i in inventory_list if not i.get("archived", False)]
 
     if st.session_state["role"] == "Shop Owner":
         st.title("Owner Dashboard")
         st.dataframe(inventory_list, use_container_width=True)
         
-        col1, col2 = st.columns(2)
+        col1, col2, col3 = st.columns(3)
         
         with col1:
             st.subheader("Add Product")
@@ -110,14 +109,14 @@ else:
 
         with col2:
             st.subheader("Update Product")
-            if inventory_list:
+            if active_items:
                 with st.form("update_form"):
                     target_id = st.selectbox(
                         "Select Item", 
-                        [i["id"] for i in inventory_list],
-                        format_func=lambda x: next(i["name"] for i in inventory_list if i["id"] == x)
+                        [i["id"] for i in active_items],
+                        format_func=lambda x: next(i["name"] for i in active_items if i["id"] == x)
                     )
-                    item = next(i for i in inventory_list if i["id"] == target_id)
+                    item = next(i for i in active_items if i["id"] == target_id)
                     up = st.number_input("New Price", value=float(item["price"]), min_value=0.0)
                     us = st.number_input("New Stock", value=int(item["stock"]), min_value=0)
                     
@@ -125,21 +124,38 @@ else:
                         inv_service.update_product(target_id, up, us)
                         st.rerun()
             else:
-                st.info("No items to update.")
+                st.info("No active items to update.")
+
+        with col3:
+            st.subheader("Archive Product")
+            if inventory_list:
+                with st.form("archive_form"):
+                    archive_id = st.selectbox(
+                        "Select Product", 
+                        [i["id"] for i in inventory_list],
+                        format_func=lambda x: f"{next(i['name'] for i in inventory_list if i['id'] == x)} (Archived: {next(i.get('archived', False) for i in inventory_list if i['id'] == x)})"
+                    )
+                    selected_item = next(i for i in inventory_list if i["id"] == archive_id)
+                    is_archived = selected_item.get("archived", False)
+                    
+                    button_label = "Unarchive Item" if is_archived else "Archive Item"
+                    if st.form_submit_button(button_label):
+                        inv_service.toggle_archive(archive_id, not is_archived)
+                        st.rerun()
 
     elif st.session_state["role"] == "Employee":
         st.title("Employee Dashboard")
-        st.dataframe(inventory_list, use_container_width=True)
+        st.dataframe(active_items, use_container_width=True)
         
         st.subheader("Record Sale")
-        if inventory_list:
+        if active_items:
             with st.form("sale_form"):
                 col1, col2 = st.columns(2)
                 with col1:
                     sell_id = st.selectbox(
                         "Item Sold", 
-                        [i["id"] for i in inventory_list],
-                        format_func=lambda x: next(i["name"] for i in inventory_list if i["id"] == x)
+                        [i["id"] for i in active_items],
+                        format_func=lambda x: next(i["name"] for i in active_items if i["id"] == x)
                     )
                 with col2:
                     sell_q = st.number_input("Qty", min_value=1)
@@ -149,7 +165,7 @@ else:
                         st.success("Sale Recorded")
                         st.rerun()
                     else:
-                        st.error("Insufficient stock or invalid item!")
+                        st.error("Insufficient stock or invalid item.")
 
     st.divider()
     st.subheader("AI Business Assistant")

@@ -2,11 +2,12 @@ import uuid
 import openai
 
 class Product:
-    def __init__(self, name, price, stock, id=None):
+    def __init__(self, name, price, stock, id=None, archived=False):
         self.id = id if id else str(uuid.uuid4())[:8]
         self.name = name
         self.price = float(price)
         self.stock = int(stock)
+        self.archived = bool(archived)
 
     def to_dict(self):
         return vars(self)
@@ -25,9 +26,19 @@ class InventoryService:
         self.products.append(new_prod)
         self.save()
 
+    def toggle_archive(self, prod_id, archive_status):
+        for p in self.products:
+            if p.id == prod_id:
+                p.archived = archive_status
+                self.save()
+                return True
+        return False
+
     def update_product(self, prod_id, price, stock):
         for p in self.products:
             if p.id == prod_id:
+                if p.archived:
+                    return False
                 p.price = price
                 p.stock = stock
                 self.save()
@@ -36,7 +47,7 @@ class InventoryService:
 
     def record_sale(self, prod_id, qty):
         for p in self.products:
-            if p.id == prod_id and p.stock >= qty:
+            if p.id == prod_id and p.stock >= qty and not p.archived:
                 p.stock -= qty
                 self.save()
                 return True

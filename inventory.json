@@ -3,24 +3,28 @@
         "id": "f8a13595",
         "name": "bumbletimps",
         "price": 10.0,
-        "stock": 9
+        "stock": 9,
+        "archived": false
     },
     {
         "id": "0104917d",
         "name": "Crumpletamps",
-        "price": 38572.0,
-        "stock": 4
+        "price": 9.0,
+        "stock": 6,
+        "archived": false
     },
     {
         "id": "2da4e616",
         "name": "Dundlegups",
         "price": 362521.0,
-        "stock": 400
+        "stock": 400,
+        "archived": false
     },
     {
         "id": "8e019f04",
         "name": "pundersunder",
         "price": 1.0,
-        "stock": 2
+        "stock": 2,
+        "archived": false
     }
 ]
