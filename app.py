@@ -154,7 +154,7 @@ else:
     st.info("Ask the AI for advice on restocking or inventory trends.")
     
     if "messages" not in st.session_state:
-        st.session_state.messages = [{"role": "assistant", "content": "Hi! Ask me a question about the inventory."}]
+        st.session_state.messages = [{"role": "assistant", "content": "Hi! Ask me about the inventory."}]
 
     chat_container = st.container()
     with chat_container:
