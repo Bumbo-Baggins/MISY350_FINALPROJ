@@ -71,17 +71,29 @@ if not st.session_state["logged_in"]:
                     st.error("Username and password cannot be empty.")
 
 else:
-    # --- Sidebar Navigation ---
+# --- Sidebar Navigation ---
     with st.sidebar:
         st.write(f"**User:** {st.session_state['username']}")
         st.write(f"**Role:** {st.session_state['role']}")
         st.divider()
         
+        # Initialize navigation state
+        if "current_page" not in st.session_state:
+            st.session_state["current_page"] = "Dashboard"
+
         nav_options = ["Dashboard", "Account Settings"]
         if st.session_state["role"] == "Shop Owner":
             nav_options.insert(1, "Archive Management")
             
-        current_page = st.radio("Navigation", nav_options)
+        st.subheader("Navigation")
+        for option in nav_options:
+            # Highlight the active button
+            btn_type = "primary" if st.session_state["current_page"] == option else "secondary"
+            if st.button(option, use_container_width=True, type=btn_type):
+                st.session_state["current_page"] = option
+                st.rerun()
+                
+        current_page = st.session_state["current_page"]
         
         st.divider()
         if st.button("Logout", use_container_width=True):
