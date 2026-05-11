@@ -241,8 +241,17 @@ else:
         with col2:
             st.subheader("Account Deletion")
             with st.expander("Delete Account"):
-                st.warning("This action cannot be undone.")
-                if st.button("Delete My Account", type="primary", use_container_width=True):
-                    if service_layer.delete_account(st.session_state["username"], users, dm):
-                        st.session_state.clear()
-                        st.rerun()
+                st.warning("This action cannot be undone. All your data will be permanently removed.")
+                st.write(f"To confirm, type your username (**{st.session_state['username']}**) below:")
+                
+                with st.form("delete_account_form"):
+                    confirm_text = st.text_input("Confirm Username")
+                    delete_submitted = st.form_submit_button("Delete My Account", type="primary", use_container_width=True)
+                    
+                    if delete_submitted:
+                        if confirm_text == st.session_state["username"]:
+                            if service_layer.delete_account(st.session_state["username"], users, dm):
+                                st.session_state.clear()
+                                st.rerun()
+                        else:
+                            st.error("Username does not match. Account deletion cancelled.")
