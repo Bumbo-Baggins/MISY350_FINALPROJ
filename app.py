@@ -71,13 +71,11 @@ if not st.session_state["logged_in"]:
                     st.error("Username and password cannot be empty.")
 
 else:
-# --- Sidebar Navigation ---
     with st.sidebar:
         st.write(f"**User:** {st.session_state['username']}")
         st.write(f"**Role:** {st.session_state['role']}")
         st.divider()
         
-        # Initialize navigation state
         if "current_page" not in st.session_state:
             st.session_state["current_page"] = "Dashboard"
 
@@ -87,7 +85,6 @@ else:
             
         st.subheader("Navigation")
         for option in nav_options:
-            # Highlight the active button
             btn_type = "primary" if st.session_state["current_page"] == option else "secondary"
             if st.button(option, use_container_width=True, type=btn_type):
                 st.session_state["current_page"] = option
@@ -104,8 +101,6 @@ else:
     active_items = [i for i in inventory_list if not i.get("archived", False)]
     archived_items = [i for i in inventory_list if i.get("archived", False)]
 
-    # --- Page Routing ---
-    
     if current_page == "Dashboard":
         if st.session_state["role"] == "Shop Owner":
             st.title("Owner Dashboard")
@@ -130,10 +125,11 @@ else:
                 st.subheader("Update Product")
                 if active_items:
                     with st.form("update_form"):
+                        # Selectbox is searchable by default, format_func makes ID visible
                         target_id = st.selectbox(
-                            "Select Item", 
+                            "Select Item (Type to search Name or ID)", 
                             [i["id"] for i in active_items],
-                            format_func=lambda x: next(i["name"] for i in active_items if i["id"] == x)
+                            format_func=lambda x: f"{x} : {next(i['name'] for i in active_items if i['id'] == x)}"
                         )
                         item = next(i for i in active_items if i["id"] == target_id)
                         up = st.number_input("New Price", value=float(item["price"]), min_value=0.0)
@@ -155,9 +151,9 @@ else:
                     col1, col2 = st.columns(2)
                     with col1:
                         sell_id = st.selectbox(
-                            "Item Sold", 
+                            "Item Sold (Type to search Name or ID)", 
                             [i["id"] for i in active_items],
-                            format_func=lambda x: next(i["name"] for i in active_items if i["id"] == x)
+                            format_func=lambda x: f"{x} : {next(i['name'] for i in active_items if i['id'] == x)}"
                         )
                     with col2:
                         sell_q = st.number_input("Qty", min_value=1)
@@ -168,6 +164,8 @@ else:
                             st.rerun()
                         else:
                             st.error("Insufficient stock or invalid item.")
+            else:
+                st.info("No active items available.")
 
         st.divider()
         st.subheader("AI Business Assistant")
@@ -215,9 +213,9 @@ else:
             if inventory_list:
                 with st.form("archive_form"):
                     archive_id = st.selectbox(
-                        "Select Product", 
+                        "Select Product (Type to search Name or ID)", 
                         [i["id"] for i in inventory_list],
-                        format_func=lambda x: f"{next(i['name'] for i in inventory_list if i['id'] == x)} (Archived: {next(i.get('archived', False) for i in inventory_list if i['id'] == x)})"
+                        format_func=lambda x: f"{x} : {next(i['name'] for i in inventory_list if i['id'] == x)} (Archived: {next(i.get('archived', False) for i in inventory_list if i['id'] == x)})"
                     )
                     selected_item = next(i for i in inventory_list if i["id"] == archive_id)
                     is_archived = selected_item.get("archived", False)
@@ -251,7 +249,7 @@ else:
                         st.error(msg)
                         
         with col2:
-            st.subheader("Account Deletion")
+            st.subheader("Danger Zone")
             with st.expander("Delete Account"):
                 st.warning("This action cannot be undone. All your data will be permanently removed.")
                 st.write(f"To confirm, type your username (**{st.session_state['username']}**) below:")
