@@ -57,6 +57,19 @@ class InventoryService:
         data = [p.to_dict() for p in self.products]
         self.dm.save_data(self.dm.inventory_file, data)
 
+
+def update_user_account(old_username, new_username, new_password_hashed, users_dict, dm):
+    if old_username != new_username:
+        if new_username in users_dict:
+            return False, "Username already taken."
+        users_dict[new_username] = users_dict.pop(old_username)
+    
+    if new_password_hashed:
+        users_dict[new_username]["password"] = new_password_hashed
+        
+    dm.save_data(dm.users_file, users_dict)
+    return True, "Account updated successfully."
+
 def delete_account(username, users_dict, dm):
     if username in users_dict:
         del users_dict[username]
