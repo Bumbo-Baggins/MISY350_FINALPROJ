@@ -1,0 +1,20 @@
+[
+    {
+        "sale_id": "3dd171a4",
+        "date": "2026-05-11 20:06:43",
+        "item_id": "0104917d",
+        "item_name": "Crumpletamps",
+        "quantity": 3,
+        "total_price": 27.0,
+        "employee": "staff"
+    },
+    {
+        "sale_id": "06f77607",
+        "date": "2026-05-11 20:06:49",
+        "item_id": "0104917d",
+        "item_name": "Crumpletamps",
+        "quantity": 3,
+        "total_price": 27.0,
+        "employee": "staff"
+    }
+]

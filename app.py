@@ -81,7 +81,8 @@ else:
 
         nav_options = ["Dashboard", "Account Settings"]
         if st.session_state["role"] == "Shop Owner":
-            nav_options.insert(1, "Archive Management")
+            nav_options.insert(1, "Recent Sales")
+            nav_options.insert(2, "Archive Management")
             
         st.subheader("Navigation")
         for option in nav_options:
@@ -125,7 +126,6 @@ else:
                 st.subheader("Update Product")
                 if active_items:
                     with st.form("update_form"):
-                        # Selectbox is searchable by default, format_func makes ID visible
                         target_id = st.selectbox(
                             "Select Item (Type to search Name or ID)", 
                             [i["id"] for i in active_items],
@@ -159,7 +159,8 @@ else:
                         sell_q = st.number_input("Qty", min_value=1)
                     
                     if st.form_submit_button("Record Sale", use_container_width=True):
-                        if inv_service.record_sale(sell_id, sell_q):
+                        # Pass the logged in username here
+                        if inv_service.record_sale(sell_id, sell_q, st.session_state["username"]):
                             st.success("Sale Recorded")
                             st.rerun()
                         else:
@@ -194,6 +195,41 @@ else:
                     st.markdown(answer)
                     
             st.session_state.messages.append({"role": "assistant", "content": answer})
+
+    elif current_page == "Recent Sales":
+        st.title("Recent Sales")
+        st.write("View and filter recorded transactions.")
+        
+        sales_data = inv_service.get_all_sales()
+        
+        if not sales_data:
+            st.info("No sales have been recorded yet.")
+        else:
+            col1, col2 = st.columns(2)
+            with col1:
+                emp_options = ["All"] + list(set([s["employee"] for s in sales_data]))
+                selected_emp = st.selectbox("Filter by Employee", emp_options)
+            with col2:
+                item_options = ["All"] + list(set([s["item_name"] for s in sales_data]))
+                selected_item = st.selectbox("Filter by Item", item_options)
+                
+            filtered_sales = sales_data
+            if selected_emp != "All":
+                filtered_sales = [s for s in filtered_sales if s["employee"] == selected_emp]
+            if selected_item != "All":
+                filtered_sales = [s for s in filtered_sales if s["item_name"] == selected_item]
+                
+            if filtered_sales:
+                st.dataframe(filtered_sales, use_container_width=True)
+                
+                # Show quick metric totals
+                total_revenue = sum([s["total_price"] for s in filtered_sales])
+                total_items = sum([s["quantity"] for s in filtered_sales])
+                m1, m2 = st.columns(2)
+                m1.metric("Filtered Revenue", f"${total_revenue:.2f}")
+                m2.metric("Filtered Items Sold", total_items)
+            else:
+                st.warning("No sales match these filters.")
 
     elif current_page == "Archive Management":
         st.title("Archive Management")

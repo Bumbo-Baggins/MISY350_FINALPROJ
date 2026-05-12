@@ -1,5 +1,6 @@
 import uuid
 import openai
+import datetime
 
 class Product:
     def __init__(self, name, price, stock, id=None, archived=False):
@@ -17,9 +18,13 @@ class InventoryService:
         self.dm = data_manager
         raw_data = self.dm.load_data(self.dm.inventory_file, [])
         self.products = [Product(**p) for p in raw_data]
+        self.sales = self.dm.load_data("sales.json", [])
 
     def get_all_inventory_dicts(self):
         return [p.to_dict() for p in self.products]
+
+    def get_all_sales(self):
+        return self.sales
 
     def add_product(self, name, price, stock):
         new_prod = Product(name, price, stock)
@@ -45,11 +50,25 @@ class InventoryService:
                 return True
         return False
 
-    def record_sale(self, prod_id, qty):
+    def record_sale(self, prod_id, qty, employee_username):
         for p in self.products:
             if p.id == prod_id and p.stock >= qty and not p.archived:
                 p.stock -= qty
                 self.save()
+                
+                # Log the sale transaction
+                sale_record = {
+                    "sale_id": str(uuid.uuid4())[:8],
+                    "date": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    "item_id": p.id,
+                    "item_name": p.name,
+                    "quantity": qty,
+                    "total_price": float(p.price * qty),
+                    "employee": employee_username
+                }
+                self.sales.append(sale_record)
+                self.dm.save_data("sales.json", self.sales)
+                
                 return True
         return False
 
