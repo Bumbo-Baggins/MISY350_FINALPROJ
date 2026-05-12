@@ -20,7 +20,7 @@ inv_service = service_layer.InventoryService(dm)
 # test accounts
 users = dm.load_data(dm.users_file, {})
 if "admin" not in users:
-    users["admin"] = {"password": hash_password("admin123"), "role": "Shop Owner"}
+    users["admin"] = {"password": hash_password("admin123"), "role": "Admin"}
     dm.save_data(dm.users_file, users)
 if "staff" not in users:
     users["staff"] = {"password": hash_password("staff123"), "role": "Employee"}
@@ -44,7 +44,7 @@ def render_login_register():
     st.title("Small Business Inventory Manager")
     
     with st.expander("View Test Accounts", expanded=True):
-        st.info("* Owner: `admin` | Pass: `admin123`\n* Employee: `staff` | Pass: `staff123`")
+        st.info("* Admin: `admin` | Pass: `admin123`\n* Employee: `staff` | Pass: `staff123`")
     
     tab1, tab2 = st.tabs(["Log In", "Register"])
     
@@ -67,7 +67,7 @@ def render_login_register():
         with st.form("register_form"):
             ru = st.text_input("New Username")
             rp = st.text_input("New Password", type="password")
-            rr = st.selectbox("Role", ["Employee", "Shop Owner"])
+            rr = st.selectbox("Role", ["Employee", "Admin"])
             if st.form_submit_button("Register"):
                 if ru.strip() and rp.strip():
                     if ru in users:
@@ -89,7 +89,7 @@ def render_sidebar():
             st.session_state["current_page"] = "Dashboard"
 
         nav_options = ["Dashboard", "Account Settings"]
-        if st.session_state["role"] == "Shop Owner":
+        if st.session_state["role"] == "Admin":
             nav_options.insert(1, "Recent Sales")
             nav_options.insert(2, "Archive Management")
             
@@ -136,8 +136,8 @@ def display_ai_assistant(active_items):
                     
             st.session_state.messages.append({"role": "assistant", "content": answer})
 
-def render_owner_dashboard(active_items):
-    st.title("Owner Dashboard")
+def render_admin_dashboard(active_items):
+    st.title("Admin Dashboard")
     
     # Top-Level Metrics
     m1, m2, m3 = st.columns(3)
@@ -220,8 +220,8 @@ def render_employee_dashboard(active_items):
             
             if st.form_submit_button("Record Sale", use_container_width=True):
                 if inv_service.record_sale(sell_id, sell_q, st.session_state["username"]):
-                    st.success("Sale recorded successfully!", icon="✅")
-                    time.sleep(2)
+                    st.toast("Sale recorded successfully!", icon="✅")
+                    time.sleep(1)
                     st.rerun()
                 else:
                     st.error("Insufficient stock or invalid item.")
@@ -346,8 +346,8 @@ else:
     current_page = st.session_state.get("current_page", "Dashboard")
 
     if current_page == "Dashboard":
-        if st.session_state["role"] == "Shop Owner":
-            render_owner_dashboard(active_items)
+        if st.session_state["role"] == "Admin":
+            render_admin_dashboard(active_items)
         elif st.session_state["role"] == "Employee":
             render_employee_dashboard(active_items)
     elif current_page == "Recent Sales":
