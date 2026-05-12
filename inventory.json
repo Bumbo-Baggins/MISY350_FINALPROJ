@@ -26,5 +26,12 @@
         "price": 1.0,
         "stock": 2,
         "archived": false
+    },
+    {
+        "id": "90c236c5",
+        "name": "finderflander",
+        "price": 10.0,
+        "stock": 400,
+        "archived": false
     }
 ]
