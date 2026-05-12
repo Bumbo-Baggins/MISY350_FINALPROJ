@@ -4,6 +4,7 @@ import service_layer
 import os
 import hashlib
 from dotenv import load_dotenv
+import time
 
 load_dotenv()
 api_key = os.getenv("OPENAI_API_KEY")
@@ -162,6 +163,7 @@ else:
                         # Pass the logged in username here
                         if inv_service.record_sale(sell_id, sell_q, st.session_state["username"]):
                             st.success("Sale Recorded")
+                            time.sleep(1.5)
                             st.rerun()
                         else:
                             st.error("Insufficient stock or invalid item.")
