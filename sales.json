@@ -7,5 +7,32 @@
         "quantity": 3,
         "total_price": 27.0,
         "employee": "staff"
+    },
+    {
+        "sale_id": "65debe3f",
+        "date": "2026-05-12 19:14:44",
+        "item_id": "90c236c5",
+        "item_name": "finderflander",
+        "quantity": 1,
+        "total_price": 10.0,
+        "employee": "staff"
+    },
+    {
+        "sale_id": "8a593a91",
+        "date": "2026-05-12 19:15:24",
+        "item_id": "90c236c5",
+        "item_name": "finderflander",
+        "quantity": 1,
+        "total_price": 10.0,
+        "employee": "staff"
+    },
+    {
+        "sale_id": "9c17a7a1",
+        "date": "2026-05-12 19:15:36",
+        "item_id": "90c236c5",
+        "item_name": "finderflander",
+        "quantity": 1,
+        "total_price": 10.0,
+        "employee": "staff"
     }
 ]
