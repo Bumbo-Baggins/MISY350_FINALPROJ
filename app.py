@@ -85,10 +85,10 @@ def render_sidebar():
             st.session_state.clear()
             st.rerun()
 
-def display_ai_assistant(active_items):
+def display_ai_assistant(active_items, sales_data):
     st.divider()
     with st.expander("💬 Chat with AI Business Assistant"):
-        st.info("Ask for advice on restocking or inventory trends.")
+        st.info("Ask for advice on restocking or sales trends.")
         
         if "messages" not in st.session_state:
             st.session_state.messages = [{"role": "assistant", "content": "Hi! Ask me about inventory."}]
@@ -108,7 +108,15 @@ def display_ai_assistant(active_items):
             with chat_container.chat_message("assistant"):
                 with st.spinner("Consulting..."):
                     low_stock = [i['name'] for i in active_items if i['stock'] < 10]
-                    summary = f"Total active items: {len(active_items)}. Items with stock under 10: {', '.join(low_stock) if low_stock else 'None'}."
+                    
+                    recent_sales = sales_data[-10:] if sales_data else []
+                    sales_str = ", ".join([f"{s['quantity']}x {s['item_name']}" for s in recent_sales]) if recent_sales else "None"
+
+                    summary = (
+                        f"Total active items: {len(active_items)}. "
+                        f"Items with stock under 10: {', '.join(low_stock) if low_stock else 'None'}. "
+                        f"Recent sales: {sales_str}."
+                    )
                     
                     answer = ai_assistant.generate_response(summary, st.session_state.messages)
                     st.markdown(answer)
@@ -151,11 +159,12 @@ def render_admin_dashboard(active_items):
 
     with tab3:
         if active_items:
+            item_lookup = {i["id"]: i["name"] for i in active_items}
             with st.form("update_form"):
                 target_id = st.selectbox(
                     "Select Item", 
                     [i["id"] for i in active_items],
-                    format_func=lambda x: f"{x} : {next(i['name'] for i in active_items if i['id'] == x)}"
+                    format_func=lambda x: f"{x} : {item_lookup[x]}"
                 )
                 item = next(i for i in active_items if i["id"] == target_id)
                 up = st.number_input("New Price", value=float(item["price"]), min_value=0.0, step=0.50)
@@ -167,7 +176,8 @@ def render_admin_dashboard(active_items):
         else:
             st.info("No active items to update.")
 
-    display_ai_assistant(active_items)
+    sales_data = inv_service.get_all_sales()
+    display_ai_assistant(active_items, sales_data)
 
 def render_employee_dashboard(active_items):
     st.title("Employee Dashboard")
@@ -184,13 +194,14 @@ def render_employee_dashboard(active_items):
     
     st.subheader("Record Sale")
     if active_items:
+        item_lookup = {i["id"]: i["name"] for i in active_items}
         with st.form("sale_form"):
             col1, col2 = st.columns(2)
             with col1:
                 sell_id = st.selectbox(
                     "Item Sold", 
                     [i["id"] for i in active_items],
-                    format_func=lambda x: f"{x} : {next(i['name'] for i in active_items if i['id'] == x)}"
+                    format_func=lambda x: f"{x} : {item_lookup[x]}"
                 )
             with col2:
                 sell_q = st.number_input("Qty", min_value=1)
@@ -205,7 +216,8 @@ def render_employee_dashboard(active_items):
     else:
         st.info("No active items available.")
 
-    display_ai_assistant(active_items)
+    sales_data = inv_service.get_all_sales()
+    display_ai_assistant(active_items, sales_data)
 
 def render_recent_sales():
     st.title("Recent Sales")
@@ -261,11 +273,12 @@ def render_archive(inventory_list, archived_items):
     with col2:
         st.subheader("Toggle Status")
         if inventory_list:
+            item_lookup = {i["id"]: f"{i['name']} (Archived: {i.get('archived', False)})" for i in inventory_list}
             with st.form("archive_form"):
                 archive_id = st.selectbox(
                     "Select Product", 
                     [i["id"] for i in inventory_list],
-                    format_func=lambda x: f"{x} : {next(i['name'] for i in inventory_list if i['id'] == x)} (Archived: {next(i.get('archived', False) for i in inventory_list if i['id'] == x)})"
+                    format_func=lambda x: f"{x} : {item_lookup[x]}"
                 )
                 selected_item = next(i for i in inventory_list if i["id"] == archive_id)
                 is_archived = selected_item.get("archived", False)

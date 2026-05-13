@@ -147,24 +147,23 @@ class AIChatAssistant:
             )
         }
 
-    def _format_history(self, chat_history):
-        return [{"role": msg["role"], "content": msg["content"]} for msg in chat_history]
-
     def generate_response(self, inventory_data, chat_history):
         if not self.client:
             return "The AI assistant is currently offline. Please configure a valid API key."
 
         messages = [self._build_system_prompt(inventory_data)]
-        messages.extend(self._format_history(chat_history[-10:]))
+        messages.extend(chat_history[-10:])
 
         try:
             response = self.client.chat.completions.create(
-                model="GPT-5.4 mini",
+                model="gpt-5.4-mini",
                 messages=messages,
                 temperature=0.2 
             )
             return response.choices[0].message.content
-        except openai.APIError:
+        except openai.APIError as e:
+            print(f"API Error: {e}") 
             return "The AI service is experiencing difficulties. Please try again later."
-        except Exception:
+        except Exception as e:
+            print(f"Unexpected Error: {e}") 
             return "An unexpected issue occurred while processing your request."
