@@ -4,6 +4,7 @@ import service_layer
 import os
 from dotenv import load_dotenv
 import time
+import datetime
 
 # Setup and Initialization
 load_dotenv()
@@ -232,19 +233,35 @@ def render_recent_sales():
         st.info("No sales have been recorded yet.")
         return
 
-    col1, col2 = st.columns(2)
+    def to_date(d):
+        if isinstance(d, str):
+            return datetime.datetime.fromisoformat(d.split("T")[0]).date()
+        if isinstance(d, datetime.datetime):
+            return d.date()
+        return d
+
+    col1, col2, col3 = st.columns(3)
     with col1:
         emp_options = ["All"] + list(set([s["employee"] for s in sales_data]))
         selected_emp = st.selectbox("Filter by Employee", emp_options)
     with col2:
         item_options = ["All"] + list(set([s["item_name"] for s in sales_data]))
         selected_item = st.selectbox("Filter by Item", item_options)
+    with col3:
+        all_dates = [to_date(s["date"]) for s in sales_data]
+        min_date = min(all_dates) if all_dates else datetime.date.today()
+        max_date = max(all_dates) if all_dates else datetime.date.today()
+        date_range = st.date_input("Filter by Date Range", (min_date, max_date))
         
     filtered_sales = sales_data
     if selected_emp != "All":
         filtered_sales = [s for s in filtered_sales if s["employee"] == selected_emp]
     if selected_item != "All":
         filtered_sales = [s for s in filtered_sales if s["item_name"] == selected_item]
+    
+    if len(date_range) == 2:
+        start_date, end_date = date_range
+        filtered_sales = [s for s in filtered_sales if start_date <= to_date(s["date"]) <= end_date]
         
     if filtered_sales:
         total_revenue = sum([s["total_price"] for s in filtered_sales])
