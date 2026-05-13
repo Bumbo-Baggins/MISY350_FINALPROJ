@@ -2,7 +2,6 @@ import streamlit as st
 import data_layer
 import service_layer
 import os
-import hashlib
 from dotenv import load_dotenv
 import time
 
@@ -11,27 +10,11 @@ load_dotenv()
 api_key = os.getenv("OPENAI_API_KEY")
 ai_assistant = service_layer.AIChatAssistant(api_key)
 
-def hash_password(password):
-    return hashlib.sha256(password.encode()).hexdigest()
-
 dm = data_layer.DataManager()
 inv_service = service_layer.InventoryService(dm)
 
-# test accounts
+service_layer.seed_initial_data(dm, inv_service)
 users = dm.load_data(dm.users_file, {})
-if "admin" not in users:
-    users["admin"] = {"password": hash_password("admin123"), "role": "Admin"}
-    dm.save_data(dm.users_file, users)
-if "staff" not in users:
-    users["staff"] = {"password": hash_password("staff123"), "role": "Employee"}
-    dm.save_data(dm.users_file, users)
-
-# sample inventory if empty
-if not inv_service.get_all_inventory_dicts():
-    inv_service.add_product("Premium Coffee Beans", 18.99, 45)
-    inv_service.add_product("Ceramic Mug", 12.50, 8)
-    inv_service.add_product("Paper Filters (100ct)", 4.99, 120)
-    inv_service.add_product("Espresso Machine Cleaner", 22.00, 3)
 
 st.set_page_config("Inventory Manager", layout="wide")
 
@@ -54,10 +37,11 @@ def render_login_register():
             u = st.text_input("Username")
             p = st.text_input("Password", type="password")
             if st.form_submit_button("Log In"):
-                if u in users and users[u]["password"] == hash_password(p):
+                success, role = service_layer.validate_login(u, p, users)
+                if success:
                     st.session_state["logged_in"] = True
                     st.session_state["username"] = u
-                    st.session_state["role"] = users[u]["role"]
+                    st.session_state["role"] = role
                     st.rerun()
                 else:
                     st.error("Invalid credentials.")
@@ -69,15 +53,11 @@ def render_login_register():
             rp = st.text_input("New Password", type="password")
             rr = st.selectbox("Role", ["Employee", "Admin"])
             if st.form_submit_button("Register"):
-                if ru.strip() and rp.strip():
-                    if ru in users:
-                        st.error("Username already exists.")
-                    else:
-                        users[ru] = {"password": hash_password(rp), "role": rr}
-                        dm.save_data(dm.users_file, users)
-                        st.success("Account created! You can now log in.")
+                success, msg = service_layer.register_user(ru, rp, rr, users, dm)
+                if success:
+                    st.success(msg)
                 else:
-                    st.error("Username and password cannot be empty.")
+                    st.error(msg)
 
 def render_sidebar():
     with st.sidebar:
@@ -127,7 +107,6 @@ def display_ai_assistant(active_items):
                 
             with chat_container.chat_message("assistant"):
                 with st.spinner("Consulting..."):
-                    # Create condensed summary for the AI context
                     low_stock = [i['name'] for i in active_items if i['stock'] < 10]
                     summary = f"Total active items: {len(active_items)}. Items with stock under 10: {', '.join(low_stock) if low_stock else 'None'}."
                     
@@ -139,14 +118,12 @@ def display_ai_assistant(active_items):
 def render_admin_dashboard(active_items):
     st.title("Admin Dashboard")
     
-    # Top-Level Metrics
     m1, m2, m3 = st.columns(3)
     m1.metric("Active Products", len(active_items))
     m2.metric("Low Stock (< 10)", len([i for i in active_items if i['stock'] < 10]))
     out_of_stock = len([i for i in active_items if i["stock"] == 0])
     m3.metric("Out of Stock", out_of_stock)
     
-    # Tabbed Interface
     tab1, tab2, tab3 = st.tabs(["📦 View Inventory", "➕ Add Product", "✏️ Update Product"])
     
     with tab1:
@@ -176,7 +153,7 @@ def render_admin_dashboard(active_items):
         if active_items:
             with st.form("update_form"):
                 target_id = st.selectbox(
-                    "Select Item (Type to search Name or ID)", 
+                    "Select Item", 
                     [i["id"] for i in active_items],
                     format_func=lambda x: f"{x} : {next(i['name'] for i in active_items if i['id'] == x)}"
                 )
@@ -211,7 +188,7 @@ def render_employee_dashboard(active_items):
             col1, col2 = st.columns(2)
             with col1:
                 sell_id = st.selectbox(
-                    "Item Sold (Type to search Name or ID)", 
+                    "Item Sold", 
                     [i["id"] for i in active_items],
                     format_func=lambda x: f"{x} : {next(i['name'] for i in active_items if i['id'] == x)}"
                 )
@@ -286,7 +263,7 @@ def render_archive(inventory_list, archived_items):
         if inventory_list:
             with st.form("archive_form"):
                 archive_id = st.selectbox(
-                    "Select Product (Type to search Name or ID)", 
+                    "Select Product", 
                     [i["id"] for i in inventory_list],
                     format_func=lambda x: f"{x} : {next(i['name'] for i in inventory_list if i['id'] == x)} (Archived: {next(i.get('archived', False) for i in inventory_list if i['id'] == x)})"
                 )
@@ -309,10 +286,9 @@ def render_settings():
             
             if st.form_submit_button("Update Account"):
                 current_user = st.session_state["username"]
-                pwd_hash = hash_password(new_password) if new_password.strip() else None
                 target_user = new_username.strip() if new_username.strip() else current_user
                 
-                success, msg = service_layer.update_user_account(current_user, target_user, pwd_hash, users, dm)
+                success, msg = service_layer.update_user_account(current_user, target_user, new_password, users, dm)
                 if success:
                     st.session_state["username"] = target_user
                     st.success(msg)
