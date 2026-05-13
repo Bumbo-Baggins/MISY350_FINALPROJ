@@ -136,14 +136,15 @@ def render_admin_dashboard(active_items):
     
     with tab1:
         st.dataframe(
-            active_items, 
-            use_container_width=True,
-            hide_index=True,
-            column_config={
-                "price": st.column_config.NumberColumn("Price", format="$%.2f"),
-                "id": st.column_config.TextColumn("ID", width="small")
-            }
-        )
+        active_items, 
+        width="stretch",
+        hide_index=True,
+        column_config={
+            "price": st.column_config.NumberColumn("Price", format="$%.2f"),
+            "id": st.column_config.TextColumn("ID", width="small"),
+            "archived": None # Hides the redundant column
+        }
+    )
         
     with tab2:
         with st.form("add_form"):
@@ -184,11 +185,12 @@ def render_employee_dashboard(active_items):
     
     st.dataframe(
         active_items, 
-        use_container_width=True,
+        width="stretch",
         hide_index=True,
         column_config={
             "price": st.column_config.NumberColumn("Price", format="$%.2f"),
-            "id": st.column_config.TextColumn("ID", width="small")
+            "id": st.column_config.TextColumn("ID", width="small"),
+            "archived": None # Hides redundant column
         }
     )
     
