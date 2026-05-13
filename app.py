@@ -223,6 +223,9 @@ def render_recent_sales():
     st.title("Recent Sales")
     sales_data = inv_service.get_all_sales()
     
+    # this sorts the most recent sales at the top
+    sales_data = sorted(sales_data, key=lambda x: x["date"], reverse=True)
+    
     if not sales_data:
         st.info("No sales have been recorded yet.")
         return

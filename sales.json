@@ -1,38 +1,182 @@
 [
     {
-        "sale_id": "3dd171a4",
-        "date": "2026-05-11 20:06:43",
-        "item_id": "0104917d",
-        "item_name": "Crumpletamps",
+        "sale_id": "fdc15fa3",
+        "date": "2026-05-01 13:38:00",
+        "item_id": "be183e5b",
+        "item_name": "Ceramic Mug",
+        "quantity": 2,
+        "total_price": 25.0,
+        "employee": "bob"
+    },
+    {
+        "sale_id": "50c694b5",
+        "date": "2026-05-02 08:49:00",
+        "item_id": "a14ad81c",
+        "item_name": "Premium Coffee Beans",
+        "quantity": 1,
+        "total_price": 18.99,
+        "employee": "charlie"
+    },
+    {
+        "sale_id": "048b7080",
+        "date": "2026-05-02 11:40:00",
+        "item_id": "8ff15bc0",
+        "item_name": "Espresso Machine Cleaner",
         "quantity": 3,
-        "total_price": 27.0,
-        "employee": "staff"
+        "total_price": 66.0,
+        "employee": "alice"
     },
     {
-        "sale_id": "65debe3f",
-        "date": "2026-05-12 19:14:44",
-        "item_id": "90c236c5",
-        "item_name": "finderflander",
+        "sale_id": "10cc6281",
+        "date": "2026-05-02 13:54:00",
+        "item_id": "5e85eb90",
+        "item_name": "Travel Thermos",
         "quantity": 1,
-        "total_price": 10.0,
-        "employee": "staff"
+        "total_price": 28.0,
+        "employee": "alice"
     },
     {
-        "sale_id": "8a593a91",
-        "date": "2026-05-12 19:15:24",
-        "item_id": "90c236c5",
-        "item_name": "finderflander",
-        "quantity": 1,
-        "total_price": 10.0,
-        "employee": "staff"
+        "sale_id": "69d83f2a",
+        "date": "2026-05-03 16:15:00",
+        "item_id": "be183e5b",
+        "item_name": "Ceramic Mug",
+        "quantity": 2,
+        "total_price": 25.0,
+        "employee": "charlie"
     },
     {
-        "sale_id": "9c17a7a1",
-        "date": "2026-05-12 19:15:36",
-        "item_id": "90c236c5",
-        "item_name": "finderflander",
+        "sale_id": "a4c551d7",
+        "date": "2026-05-04 11:40:00",
+        "item_id": "5bfcc52b",
+        "item_name": "Matcha Powder",
+        "quantity": 3,
+        "total_price": 73.5,
+        "employee": "bob"
+    },
+    {
+        "sale_id": "73f80b66",
+        "date": "2026-05-04 18:47:00",
+        "item_id": "5bfcc52b",
+        "item_name": "Matcha Powder",
+        "quantity": 3,
+        "total_price": 73.5,
+        "employee": "bob"
+    },
+    {
+        "sale_id": "cb9d270f",
+        "date": "2026-05-05 11:03:00",
+        "item_id": "8ff15bc0",
+        "item_name": "Espresso Machine Cleaner",
         "quantity": 1,
-        "total_price": 10.0,
-        "employee": "staff"
+        "total_price": 22.0,
+        "employee": "charlie"
+    },
+    {
+        "sale_id": "d8cf4e85",
+        "date": "2026-05-07 08:27:00",
+        "item_id": "be183e5b",
+        "item_name": "Ceramic Mug",
+        "quantity": 3,
+        "total_price": 37.5,
+        "employee": "charlie"
+    },
+    {
+        "sale_id": "b28083e9",
+        "date": "2026-05-07 13:44:00",
+        "item_id": "be183e5b",
+        "item_name": "Ceramic Mug",
+        "quantity": 1,
+        "total_price": 12.5,
+        "employee": "charlie"
+    },
+    {
+        "sale_id": "60066e38",
+        "date": "2026-05-07 18:03:00",
+        "item_id": "5bfcc52b",
+        "item_name": "Matcha Powder",
+        "quantity": 1,
+        "total_price": 24.5,
+        "employee": "bob"
+    },
+    {
+        "sale_id": "db9878d7",
+        "date": "2026-05-08 17:30:00",
+        "item_id": "08f68849",
+        "item_name": "Paper Filters (100ct)",
+        "quantity": 2,
+        "total_price": 9.98,
+        "employee": "charlie"
+    },
+    {
+        "sale_id": "b828c7f1",
+        "date": "2026-05-09 09:35:00",
+        "item_id": "5bfcc52b",
+        "item_name": "Matcha Powder",
+        "quantity": 2,
+        "total_price": 49.0,
+        "employee": "bob"
+    },
+    {
+        "sale_id": "18a4fb57",
+        "date": "2026-05-09 15:44:00",
+        "item_id": "a14ad81c",
+        "item_name": "Premium Coffee Beans",
+        "quantity": 4,
+        "total_price": 75.96,
+        "employee": "bob"
+    },
+    {
+        "sale_id": "f413c283",
+        "date": "2026-05-09 16:02:00",
+        "item_id": "8ff15bc0",
+        "item_name": "Espresso Machine Cleaner",
+        "quantity": 3,
+        "total_price": 66.0,
+        "employee": "alice"
+    },
+    {
+        "sale_id": "9a93715f",
+        "date": "2026-05-10 11:57:00",
+        "item_id": "a14ad81c",
+        "item_name": "Premium Coffee Beans",
+        "quantity": 1,
+        "total_price": 18.99,
+        "employee": "bob"
+    },
+    {
+        "sale_id": "94da167a",
+        "date": "2026-05-10 17:40:00",
+        "item_id": "08f68849",
+        "item_name": "Paper Filters (100ct)",
+        "quantity": 1,
+        "total_price": 4.99,
+        "employee": "bob"
+    },
+    {
+        "sale_id": "de4e801e",
+        "date": "2026-05-11 16:36:00",
+        "item_id": "a14ad81c",
+        "item_name": "Premium Coffee Beans",
+        "quantity": 1,
+        "total_price": 18.99,
+        "employee": "charlie"
+    },
+    {
+        "sale_id": "2c6d51b7",
+        "date": "2026-05-12 16:36:00",
+        "item_id": "8ff15bc0",
+        "item_name": "Espresso Machine Cleaner",
+        "quantity": 4,
+        "total_price": 88.0,
+        "employee": "charlie"
+    },
+    {
+        "sale_id": "28834aed",
+        "date": "2026-05-12 18:29:00",
+        "item_id": "be183e5b",
+        "item_name": "Ceramic Mug",
+        "quantity": 3,
+        "total_price": 37.5,
+        "employee": "charlie"
     }
 ]
